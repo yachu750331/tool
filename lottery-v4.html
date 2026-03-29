@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FB 粉絲專頁留言抽獎程式</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a12;--surface:#12121e;--surface2:#1a1a2e;--surface3:#22223a;
+  --accent:#6c5ce7;--accent2:#a29bfe;--accent3:#fd79a8;
+  --gold:#ffd700;--gold2:#ffaa00;
+  --text:#e8e8f0;--text2:#9898b0;--text3:#6868a0;
+  --border:#2a2a45;--success:#00b894;--danger:#ff6b6b;
+  --radius:14px;--radius-sm:10px;
+}
+html{font-size:15px}
+body{
+  font-family:'Noto Sans TC','Outfit',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(108,92,231,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(253,121,168,0.06) 0%, transparent 60%);
+}
+
+/* ── Layout ── */
+.app{max-width:900px;margin:0 auto;padding:24px 20px 60px}
+.app-header{text-align:center;padding:48px 0 36px;position:relative}
+.app-header h1{
+  font-family:'Outfit','Noto Sans TC',sans-serif;
+  font-size:2.4rem;font-weight:800;
+  background:linear-gradient(135deg,var(--accent2),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.5px;
+}
+.app-header p{color:var(--text2);margin-top:8px;font-size:.95rem}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--surface2);border:1px solid var(--border);
+  padding:6px 14px;border-radius:99px;font-size:.78rem;color:var(--text2);
+  margin-top:14px;
+}
+.badge .dot{width:8px;height:8px;border-radius:50%;background:var(--danger)}
+.badge.connected .dot{background:var(--success)}
+
+/* ── Cards ── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:28px;margin-bottom:20px;
+  transition:border-color .3s;
+}
+.card:hover{border-color:var(--surface3)}
+.card-title{
+  font-size:1.05rem;font-weight:700;margin-bottom:18px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-title .step{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0;
+}
+
+/* ── Form Elements ── */
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+input,select,textarea{
+  width:100%;padding:12px 16px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);
+  font-size:.92rem;font-family:inherit;
+  transition:border-color .25s,box-shadow .25s;outline:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(108,92,231,0.15);
+}
+input::placeholder{color:var(--text3)}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.row>*{flex:1;min-width:140px}
+.row-3>*{flex:1;min-width:120px}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 24px;border:none;border-radius:var(--radius-sm);
+  font-size:.92rem;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.btn:active{transform:scale(0.97)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),#8b5cf6);
+  color:#fff;box-shadow:0 4px 20px rgba(108,92,231,0.3);
+}
+.btn-primary:hover{box-shadow:0 6px 28px rgba(108,92,231,0.45);transform:translateY(-1px)}
+.btn-facebook{
+  background:#1877F2;color:#fff;
+  box-shadow:0 4px 16px rgba(24,119,242,0.3);
+}
+.btn-facebook:hover{background:#166bdb}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold2),var(--gold),#ffe066);
+  color:#1a1a2e;box-shadow:0 4px 24px rgba(255,215,0,0.25);
+}
+.btn-gold:hover{box-shadow:0 6px 32px rgba(255,215,0,0.4);transform:translateY(-1px)}
+.btn-outline{
+  background:transparent;border:1px solid var(--border);color:var(--text2);
+}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-sm{padding:8px 16px;font-size:.82rem}
+.btn-block{width:100%}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none!important}
+
+/* ── Select List (Pages / Posts) ── */
+.select-list{
+  max-height:280px;overflow-y:auto;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--surface2);
+}
+.select-list::-webkit-scrollbar{width:6px}
+.select-list::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
+.select-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;cursor:pointer;
+  border-bottom:1px solid var(--border);
+  transition:background .2s;
+}
+.select-item:last-child{border-bottom:none}
+.select-item:hover{background:var(--surface3)}
+.select-item.active{background:rgba(108,92,231,0.12);border-color:var(--accent)}
+.select-item img{
+  width:44px;height:44px;border-radius:10px;object-fit:cover;
+  border:2px solid var(--border);flex-shrink:0;
+}
+.select-item .info{flex:1;overflow:hidden}
+.select-item .info .name{font-weight:600;font-size:.92rem}
+.select-item .info .meta{font-size:.78rem;color:var(--text3);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── Comments Table ── */
+.comment-count{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--surface2);padding:8px 16px;border-radius:99px;
+  font-size:.85rem;color:var(--accent2);font-weight:600;margin-bottom:16px;
+}
+.comments-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.comments-table th{
+  text-align:left;padding:10px 14px;
+  color:var(--text3);font-weight:500;font-size:.8rem;
+  border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.comments-table td{padding:10px 14px;border-bottom:1px solid rgba(42,42,69,0.5)}
+.comments-table tr:hover td{background:var(--surface2)}
+.comment-user{display:flex;align-items:center;gap:10px}
+.comment-user img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+
+/* ── Prize Config ── */
+.prize-row{
+  display:flex;gap:10px;align-items:center;margin-bottom:10px;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.prize-row input{flex:1}
+.prize-row .qty{width:80px;flex:none}
+.remove-prize{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--border);
+  background:transparent;color:var(--danger);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;transition:all .2s;flex-shrink:0;
+}
+.remove-prize:hover{background:rgba(255,107,107,0.1);border-color:var(--danger)}
+
+/* ── Lottery Animation Overlay ── */
+.lottery-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(10,10,18,0.92);backdrop-filter:blur(12px);
+  z-index:1000;display:none;align-items:center;justify-content:center;
+  flex-direction:column;
+}
+.lottery-overlay.show{display:flex}
+.slot-machine{text-align:center;perspective:600px}
+.slot-name{
+  font-size:2.8rem;font-weight:900;
+  font-family:'Outfit','Noto Sans TC',sans-serif;
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  min-height:80px;display:flex;align-items:center;justify-content:center;
+  animation:none;
+}
+.slot-name.rolling{animation:slotRoll .08s infinite}
+@keyframes slotRoll{
+  0%{transform:translateY(-4px);opacity:0.6}
+  50%{transform:translateY(4px);opacity:1}
+  100%{transform:translateY(-4px);opacity:0.6}
+}
+.slot-avatar{
+  width:100px;height:100px;border-radius:50%;
+  border:4px solid var(--gold);margin:0 auto 20px;
+  object-fit:cover;opacity:0;transition:opacity .4s;
+  box-shadow:0 0 40px rgba(255,215,0,0.3);
+}
+.slot-avatar.show{opacity:1}
+.prize-label{
+  font-size:1.1rem;color:var(--accent2);margin-bottom:16px;font-weight:600;
+}
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1001}
+
+/* ── Winners Display ── */
+.winners-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.winner-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:18px;
+  display:flex;align-items:center;gap:14px;
+  animation:winnerIn .5s ease both;
+  position:relative;overflow:hidden;
+}
+.winner-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--accent3),var(--accent));
+}
+@keyframes winnerIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.winner-card img{
+  width:50px;height:50px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--gold);flex-shrink:0;
+}
+.winner-info .winner-name{font-weight:700;font-size:.95rem}
+.winner-info .winner-prize{font-size:.82rem;color:var(--gold);margin-top:3px}
+
+/* ── Utilities ── */
+.hidden{display:none!important}
+.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}
+.mb-12{margin-bottom:12px}
+.text-center{text-align:center}
+.text-muted{color:var(--text3);font-size:.85rem}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.flex-between{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-state .icon{font-size:2.4rem;margin-bottom:12px}
+.tag{
+  display:inline-block;padding:4px 10px;border-radius:6px;
+  font-size:.78rem;font-weight:600;
+  background:rgba(108,92,231,0.15);color:var(--accent2);
+}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--surface3);border:1px solid var(--border);
+  padding:14px 24px;border-radius:var(--radius-sm);
+  font-size:.88rem;color:var(--text);z-index:2000;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  transition:transform .35s cubic-bezier(.175,.885,.32,1.275);
+  pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .app{padding:16px 12px 40px}
+  .app-header h1{font-size:1.8rem}
+  .card{padding:20px 16px}
+  .slot-name{font-size:1.8rem}
+  .winners-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header class="app-header">
+    <h1>🎰 FB 留言抽獎程式</h1>
+    <p>連結粉絲專頁 → 選擇貼文 → 篩選留言 → 公平抽獎</p>
+    <div class="badge" id="statusBadge">
+      <span class="dot"></span>
+      <span id="statusText">尚未連結 Facebook</span>
+    </div>
+  </header>
+
+  <!-- Step 0: App ID -->
+  <div class="card" id="step0">
+    <div class="card-title"><span class="step">0</span> 設定 Facebook App</div>
+    <label for="appIdInput">Facebook App ID</label>
+    <div class="row">
+      <input type="text" id="appIdInput" placeholder="貼上你的 Facebook App ID">
+      <div style="flex:none"><button class="btn btn-primary" onclick="initFB()">初始化</button></div>
+    </div>
+    <p class="text-muted mt-12">
+      前往 <a href="https://developers.facebook.com/" target="_blank" style="color:var(--accent2)">developers.facebook.com</a> 建立 App 取得 ID。<br>
+      App 需要的權限：<span class="tag">pages_show_list</span> <span class="tag">pages_read_engagement</span> <span class="tag">pages_read_user_content</span> <span class="tag">pages_manage_metadata</span> <span class="tag">business_management</span>
+    </p>
+  </div>
+
+  <!-- Step 1: Login -->
+  <div class="card hidden" id="step1">
+    <div class="card-title"><span class="step">1</span> 登入 Facebook</div>
+    <button class="btn btn-facebook btn-block" id="loginBtn" onclick="fbLogin()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      使用 Facebook 帳號登入
+    </button>
+  </div>
+
+  <!-- Step 2: Select Page -->
+  <div class="card hidden" id="step2">
+    <div class="card-title"><span class="step">2</span> 選擇粉絲專頁</div>
+    <div id="pageList" class="select-list">
+      <div class="empty-state"><div class="icon">📄</div>載入中...</div>
+    </div>
+  </div>
+
+  <!-- Step 3: Select Post -->
+  <div class="card hidden" id="step3">
+    <div class="card-title"><span class="step">3</span> 搜尋並選擇貼文</div>
+    <label>貼文關鍵字搜尋</label>
+    <div class="row mb-12">
+      <input type="text" id="postKeyword" placeholder="輸入關鍵字搜尋貼文...">
+      <div style="flex:none"><button class="btn btn-primary" onclick="searchPosts()">搜尋</button></div>
+    </div>
+    <div id="postList" class="select-list hidden"></div>
+  </div>
+
+  <!-- Step 4: Filter Comments -->
+  <div class="card hidden" id="step4">
+    <div class="card-title"><span class="step">4</span> 篩選留言</div>
+
+    <!-- 載入狀態 -->
+    <div id="loadStatus" class="mb-12" style="padding:10px 14px;background:var(--surface2);border-radius:var(--radius-sm);font-size:.85rem;color:var(--text2)">
+      已載入 <strong id="loadedCount" style="color:var(--accent2)">0</strong> 則留言
+      （有用戶資料：<strong id="withFromCount" style="color:var(--success)">0</strong>，
+      無用戶資料：<strong id="noFromCount" style="color:var(--danger)">0</strong>）
+      <button class="btn btn-outline btn-sm" onclick="viewAllRaw()" style="margin-left:12px">🔍 另開視窗檢視全部留言</button>
+    </div>
+
+    <div class="row mb-12">
+      <div>
+        <label>開始日期</label>
+        <input type="date" id="dateFrom">
+      </div>
+      <div>
+        <label>結束日期</label>
+        <input type="date" id="dateTo">
+      </div>
+    </div>
+    <label>留言關鍵字（選填，多個用逗號分隔）</label>
+    <div class="row">
+      <input type="text" id="commentKeyword" placeholder="例如：+1, 我要參加, 抽獎">
+      <div style="flex:none"><button class="btn btn-primary" onclick="filterComments()">篩選留言</button></div>
+    </div>
+    <div id="commentResult" class="mt-20 hidden">
+      <div class="flex-between mb-12">
+        <span class="comment-count">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          符合條件：<strong id="matchCount">0</strong> 則留言
+        </span>
+      </div>
+      <div style="max-height:300px;overflow-y:auto">
+        <table class="comments-table">
+          <thead><tr><th>用戶</th><th>留言內容</th><th>時間</th></tr></thead>
+          <tbody id="commentsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: Prize Config -->
+  <div class="card hidden" id="step5">
+    <div class="card-title"><span class="step">5</span> 設定獎品</div>
+    <div id="prizeList">
+      <div class="prize-row">
+        <input type="text" class="prize-name" placeholder="獎品名稱，例如：頭獎 iPhone 16">
+        <input type="number" class="prize-qty qty" placeholder="份數" min="1" value="1">
+        <button class="remove-prize" onclick="removePrize(this)" title="移除">✕</button>
+      </div>
+    </div>
+    <button class="btn btn-outline btn-sm mt-12" onclick="addPrize()">＋ 新增獎品</button>
+    <div class="divider"></div>
+    <div class="row">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="noDuplicate" checked style="width:auto;accent-color:var(--accent)">
+        排除重複中獎（同一人只能得一個獎）
+      </label>
+    </div>
+    <button class="btn btn-gold btn-block mt-20" onclick="startLottery()" id="startBtn">
+      🎰 開始抽獎！
+    </button>
+  </div>
+
+  <!-- Step 6: Results -->
+  <div class="card hidden" id="step6">
+    <div class="card-title"><span class="step">🏆</span> 中獎名單</div>
+    <div id="winnersGrid" class="winners-grid"></div>
+    <div class="divider"></div>
+    <div class="flex-between">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">📥 匯出 CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="resetLottery()">🔄 重新抽獎</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lottery Animation -->
+<div class="lottery-overlay" id="lotteryOverlay">
+  <div class="slot-machine">
+    <div class="prize-label" id="currentPrizeLabel"></div>
+    <img class="slot-avatar" id="slotAvatar" src="" alt="">
+    <div class="slot-name" id="slotName">準備中...</div>
+    <button class="btn btn-gold mt-24 hidden" id="nextDrawBtn" onclick="drawNext()">抽出下一位 →</button>
+  </div>
+</div>
+<div class="confetti-container" id="confetti"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───
+let FB_APP_ID = '';
+let accessToken = '';
+let pages = [];
+let selectedPage = null;
+let posts = [];
+let selectedPost = null;
+let allComments = [];
+let filteredComments = [];
+let winners = [];
+let prizeQueue = [];
+let drawnIds = new Set();
+
+// ─── Toast ───
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── Step 0: Init FB SDK ───
+function initFB() {
+  FB_APP_ID = document.getElementById('appIdInput').value.trim();
+  if (!FB_APP_ID) { toast('請輸入 App ID'); return; }
+
+  if (document.getElementById('fb-sdk')) {
+    FB.init({ appId: FB_APP_ID, cookie: true, xfbml: false, version: 'v19.0' });
+    show('step1');
+    toast('Facebook SDK 已初始化');
+    return;
+  }
+
+  window.fbAsyncInit = function() {
+    FB.init({ appId: FB_APP_ID, cookie: true, xfbml: false, version: 'v19.0' });
+    show('step1');
+    toast('Facebook SDK 已初始化');
+  };
+
+  const s = document.createElement('script');
+  s.id = 'fb-sdk';
+  s.src = 'https://connect.facebook.net/zh_TW/sdk.js';
+  s.async = true; s.defer = true;
+  document.body.appendChild(s);
+}
+
+// ─── Step 1: Login ───
+function fbLogin() {
+  FB.login(function(response) {
+    if (response.authResponse) {
+      accessToken = response.authResponse.accessToken;
+      updateStatus(true);
+      loadPages();
+    } else {
+      toast('登入已取消');
+    }
+  }, { scope: 'pages_show_list,pages_read_engagement,pages_read_user_content,pages_manage_metadata,business_management' });
+}
+
+function updateStatus(connected) {
+  const badge = document.getElementById('statusBadge');
+  const text = document.getElementById('statusText');
+  if (connected) {
+    badge.classList.add('connected');
+    text.textContent = '已連結 Facebook';
+  } else {
+    badge.classList.remove('connected');
+    text.textContent = '尚未連結 Facebook';
+  }
+}
+
+// ─── Step 2: Load Pages ───
+function loadPages() {
+  FB.api('/me/accounts', {
+    access_token: accessToken,
+    fields: 'id,name,access_token,category,tasks'
+  }, function(res) {
+    console.log('[FB抽獎] /me/accounts 回傳:', JSON.stringify(res, null, 2));
+
+    if (!res || res.error) {
+      const errMsg = res && res.error ? res.error.message : '未知錯誤';
+      console.error('[FB抽獎] API 錯誤:', errMsg);
+      toast('無法取得粉絲專頁：' + errMsg);
+      return;
+    }
+
+    pages = res.data || [];
+    const container = document.getElementById('pageList');
+
+    if (pages.length === 0) {
+      console.warn('[FB抽獎] 回傳空陣列，可能原因：帳號在粉專的角色權限不足（需至少「編輯」）');
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">😕</div>
+          找不到任何粉絲專頁<br>
+          <span style="font-size:.78rem;color:var(--text3);margin-top:8px;display:block;line-height:1.6">
+            可能原因：此帳號在粉專的角色為「版主」或更低，<br>
+            Graph API 需要至少「編輯」或「管理員」角色。<br>
+            請到粉專設定 → 粉絲專頁存取權限 確認角色。<br>
+            <span style="color:var(--accent2)">（詳細資訊已印在瀏覽器 Console）</span>
+          </span>
+        </div>`;
+      show('step2');
+      return;
+    }
+
+    // 印出每個粉專的 tasks 供除錯
+    pages.forEach(p => {
+      console.log(`[FB抽獎] 粉專: ${p.name} (${p.id}) | 任務權限: ${(p.tasks || []).join(', ')}`);
+    });
+
+    container.innerHTML = pages.map((p, i) => {
+      const tasks = (p.tasks || []).map(t => {
+        const labels = { MANAGE:'管理', CREATE_CONTENT:'建立內容', MODERATE:'審核', ADVERTISE:'廣告', ANALYZE:'分析', MESSAGING:'訊息' };
+        return labels[t] || t;
+      }).join('、');
+      return `
+        <div class="select-item" onclick="selectPage(${i})">
+          <img src="https://graph.facebook.com/${p.id}/picture?type=small" alt="">
+          <div class="info">
+            <div class="name">${esc(p.name)}</div>
+            <div class="meta">${esc(p.category || '')} · ID: ${p.id}</div>
+            <div class="meta" style="color:var(--accent2)">權限：${tasks || '無'}</div>
+          </div>
+        </div>`;
+    }).join('');
+    show('step2');
+  });
+}
+
+function selectPage(idx) {
+  selectedPage = pages[idx];
+  document.querySelectorAll('#pageList .select-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  show('step3');
+  toast(`已選擇：${selectedPage.name}`);
+}
+
+// ─── Step 3: Search Posts ───
+function searchPosts() {
+  const keyword = document.getElementById('postKeyword').value.trim();
+  const listEl = document.getElementById('postList');
+  listEl.classList.remove('hidden');
+  listEl.innerHTML = '<div class="empty-state">載入貼文中...</div>';
+
+  const pageToken = selectedPage.access_token;
+  FB.api(`/${selectedPage.id}/posts`, {
+    access_token: pageToken,
+    fields: 'id,message,created_time,full_picture',
+    limit: 100
+  }, function(res) {
+    if (!res || res.error) { listEl.innerHTML = '<div class="empty-state">無法取得貼文</div>'; return; }
+    posts = (res.data || []).filter(p => {
+      if (!keyword) return true;
+      return (p.message || '').toLowerCase().includes(keyword.toLowerCase());
+    });
+    if (posts.length === 0) {
+      listEl.innerHTML = '<div class="empty-state"><div class="icon">🔍</div>找不到符合的貼文</div>';
+      return;
+    }
+    listEl.innerHTML = posts.map((p, i) => `
+      <div class="select-item" onclick="selectPost(${i})">
+        ${p.full_picture ? `<img src="${p.full_picture}" alt="">` : `<div style="width:44px;height:44px;border-radius:10px;background:var(--surface3);display:flex;align-items:center;justify-content:center">📝</div>`}
+        <div class="info">
+          <div class="name">${esc((p.message || '(無文字)').substring(0, 60))}${(p.message||'').length > 60 ? '...' : ''}</div>
+          <div class="meta">${formatDate(p.created_time)}</div>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+function selectPost(idx) {
+  selectedPost = posts[idx];
+  document.querySelectorAll('#postList .select-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  toast('已選擇貼文，載入留言中...');
+  loadAllComments();
+}
+
+// ─── Step 4: Load & Filter Comments ───
+function loadAllComments() {
+  allComments = [];
+  const pageToken = selectedPage.access_token;
+  const userToken = accessToken;
+
+  // ★ 先用一小批測試兩種 Token，看哪個能取到 from
+  console.log('[FB抽獎] 測試兩種 Token...');
+  console.log('[FB抽獎] Page Token (前20字):', pageToken.substring(0, 20) + '...');
+  console.log('[FB抽獎] User Token (前20字):', userToken.substring(0, 20) + '...');
+
+  // 測試 Page Token
+  FB.api(`/${selectedPost.id}/comments`, {
+    access_token: pageToken,
+    fields: 'from{id,name,picture},message,created_time',
+    limit: 3
+  }, function(resPage) {
+    const pageFromCount = (resPage.data || []).filter(c => c.from).length;
+    console.log(`[FB抽獎] Page Token 測試: ${(resPage.data||[]).length} 則, 有from: ${pageFromCount}`);
+
+    // 測試 User Token
+    FB.api(`/${selectedPost.id}/comments`, {
+      access_token: userToken,
+      fields: 'from{id,name,picture},message,created_time',
+      limit: 3
+    }, function(resUser) {
+      const userFromCount = (resUser.data || []).filter(c => c.from).length;
+      console.log(`[FB抽獎] User Token 測試: ${(resUser.data||[]).length} 則, 有from: ${userFromCount}`);
+
+      // 自動選擇較好的 Token
+      let useToken;
+      let tokenLabel;
+      if (userFromCount > pageFromCount) {
+        useToken = userToken;
+        tokenLabel = 'User Token';
+      } else {
+        useToken = pageToken;
+        tokenLabel = 'Page Token';
+      }
+
+      console.log(`[FB抽獎] 選擇使用: ${tokenLabel} (from 命中率較高)`);
+      toast(`使用 ${tokenLabel} 載入留言...`);
+
+      // 正式載入全部留言
+      fetchAllComments(useToken);
+    });
+  });
+}
+
+function fetchAllComments(token) {
+  allComments = [];
+
+  function updateLoadStatus() {
+    const withFrom = allComments.filter(c => c.from && c.from.name).length;
+    const noFrom = allComments.length - withFrom;
+    document.getElementById('loadedCount').textContent = allComments.length;
+    document.getElementById('withFromCount').textContent = withFrom;
+    document.getElementById('noFromCount').textContent = noFrom;
+  }
+
+  function fetchPage(afterCursor) {
+    const params = {
+      access_token: token,
+      fields: 'from{id,name,picture},message,created_time',
+      limit: 100
+    };
+    if (afterCursor) params.after = afterCursor;
+
+    FB.api(`/${selectedPost.id}/comments`, params, function(res) {
+      if (!res || res.error) {
+        console.error('[FB抽獎] 載入留言錯誤:', res && res.error);
+        updateLoadStatus();
+        show('step4');
+        toast(`已載入 ${allComments.length} 則留言`);
+        return;
+      }
+
+      if (res.data && res.data.length > 0) {
+        allComments = allComments.concat(res.data);
+        updateLoadStatus();
+      }
+
+      // 繼續翻頁
+      if (res.paging && res.paging.cursors && res.paging.cursors.after && res.data && res.data.length > 0) {
+        fetchPage(res.paging.cursors.after);
+      } else {
+        // 全部載完
+        console.log(`[FB抽獎] 全部留言載入完成: ${allComments.length} 則`);
+        const withFrom = allComments.filter(c => c.from).length;
+        console.log(`[FB抽獎] 有 from: ${withFrom}, 無 from: ${allComments.length - withFrom}`);
+        console.log('[FB抽獎] 前 3 則原始資料:', JSON.stringify(allComments.slice(0, 3), null, 2));
+        updateLoadStatus();
+        show('step4');
+        toast(`已載入 ${allComments.length} 則留言 (有用戶資料: ${withFrom})`);
+      }
+    });
+  }
+
+  fetchPage(null);
+}
+
+// ─── 另開視窗顯示所有原始留言 ───
+function viewAllRaw() {
+  if (allComments.length === 0) { toast('尚未載入留言'); return; }
+
+  const win = window.open('', '_blank', 'width=1000,height=700');
+  if (!win) { toast('請允許彈出視窗'); return; }
+
+  const rows = allComments.map((c, i) => {
+    const name = c.from ? esc(c.from.name || '(無名稱)') : '<span style="color:#ff6b6b">⚠ 無用戶資料 (from=null)</span>';
+    const pic = c.from && c.from.picture ? c.from.picture.data.url : '';
+    const msg = esc((c.message || '(空白留言)'));
+    const time = formatDate(c.created_time);
+    const fromId = c.from ? c.from.id : 'N/A';
+    return `<tr>
+      <td style="color:#888">${i + 1}</td>
+      <td>${pic ? `<img src="${pic}" style="width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:6px">` : ''}${name}</td>
+      <td style="font-size:12px;color:#666">${fromId}</td>
+      <td>${msg}</td>
+      <td style="white-space:nowrap;color:#888">${time}</td>
+      <td style="color:${c.from ? '#00b894' : '#ff6b6b'}">${c.from ? '✓' : '✗'}</td>
+    </tr>`;
+  }).join('');
+
+  const withFrom = allComments.filter(c => c.from).length;
+  const noFrom = allComments.length - withFrom;
+
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>全部留言原始資料 (${allComments.length} 則)</title>
+    <style>
+      body{font-family:-apple-system,sans-serif;background:#0a0a12;color:#e0e0f0;padding:20px;margin:0}
+      h1{font-size:18px;margin-bottom:4px}
+      .summary{color:#9898b0;font-size:14px;margin-bottom:16px}
+      .summary b{color:#e0e0f0}
+      .ok{color:#00b894} .bad{color:#ff6b6b}
+      table{width:100%;border-collapse:collapse;font-size:13px}
+      th{text-align:left;padding:8px 10px;color:#6868a0;border-bottom:2px solid #2a2a45;font-size:11px;text-transform:uppercase}
+      td{padding:7px 10px;border-bottom:1px solid #1a1a2e;vertical-align:top}
+      tr:hover td{background:#12121e}
+      img{border:1px solid #2a2a45}
+    </style></head><body>
+    <h1>📋 全部留言原始資料</h1>
+    <div class="summary">
+      共 <b>${allComments.length}</b> 則留言 ｜
+      <span class="ok">有用戶資料：${withFrom}</span> ｜
+      <span class="bad">無用戶資料 (from=null)：${noFrom}</span>
+      ${noFrom > 0 ? '<br>⚠ Facebook 隱私政策限制：非粉專管理角色可能無法取得留言者資訊' : ''}
+    </div>
+    <table>
+      <thead><tr><th>#</th><th>用戶名稱</th><th>用戶ID</th><th>留言內容</th><th>時間</th><th>from</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></body></html>`);
+  win.document.close();
+}
+
+function filterComments() {
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+  const kwRaw = document.getElementById('commentKeyword').value.trim();
+  const keywords = kwRaw ? kwRaw.split(/[,，]/).map(k => k.trim().toLowerCase()).filter(Boolean) : [];
+
+  console.log('[FB抽獎] 篩選條件:', { from, to, keywords, totalComments: allComments.length });
+
+  filteredComments = allComments.filter(c => {
+    // ★ 必須有用戶資料才能參加抽獎（from 不為空）
+    if (!c.from) return false;
+
+    // 日期篩選（空 = 不限制）
+    if (from) {
+      const cDate = new Date(c.created_time);
+      const fromDate = new Date(from);
+      fromDate.setHours(0,0,0,0);
+      if (cDate < fromDate) return false;
+    }
+    if (to) {
+      const cDate = new Date(c.created_time);
+      const toDate = new Date(to);
+      toDate.setHours(23,59,59,999);
+      if (cDate > toDate) return false;
+    }
+
+    // 關鍵字篩選（空 = 不限制，全部通過）
+    if (keywords.length > 0) {
+      const msg = (c.message || '').toLowerCase();
+      return keywords.some(kw => msg.includes(kw));
+    }
+    return true;
+  });
+
+  // Deduplicate by user (keep first comment)
+  const seen = new Set();
+  filteredComments = filteredComments.filter(c => {
+    if (seen.has(c.from.id)) return false;
+    seen.add(c.from.id);
+    return true;
+  });
+
+  const noFromCount = allComments.filter(c => !c.from).length;
+  console.log(`[FB抽獎] 篩選結果: ${filteredComments.length} 人通過 (${noFromCount} 則因無用戶資料被排除)`);
+
+  // Render
+  document.getElementById('matchCount').textContent = filteredComments.length;
+  const tbody = document.getElementById('commentsBody');
+  tbody.innerHTML = filteredComments.slice(0, 100).map(c => {
+    const pic = c.from && c.from.picture ? c.from.picture.data.url : '';
+    return `<tr>
+      <td><div class="comment-user">
+        <img src="${pic || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22><rect fill=%22%231a1a2e%22 width=%2232%22 height=%2232%22 rx=%2216%22/></svg>'}" alt="">
+        <span>${esc(c.from ? c.from.name : '未知')}</span>
+      </div></td>
+      <td>${esc((c.message || '').substring(0, 80))}${(c.message||'').length > 80 ? '...' : ''}</td>
+      <td style="white-space:nowrap;color:var(--text3)">${formatDate(c.created_time)}</td>
+    </tr>`;
+  }).join('');
+  if (filteredComments.length > 100) {
+    tbody.innerHTML += `<tr><td colspan="3" class="text-muted text-center">僅顯示前 100 筆，共 ${filteredComments.length} 筆符合</td></tr>`;
+  }
+
+  document.getElementById('commentResult').classList.remove('hidden');
+  if (filteredComments.length > 0) show('step5');
+  toast(`篩選完成：${filteredComments.length} 位不重複用戶`);
+}
+
+// ─── Step 5: Prize Config ───
+function addPrize() {
+  const row = document.createElement('div');
+  row.className = 'prize-row';
+  row.innerHTML = `
+    <input type="text" class="prize-name" placeholder="獎品名稱">
+    <input type="number" class="prize-qty qty" placeholder="份數" min="1" value="1">
+    <button class="remove-prize" onclick="removePrize(this)" title="移除">✕</button>
+  `;
+  document.getElementById('prizeList').appendChild(row);
+}
+
+function removePrize(btn) {
+  const list = document.getElementById('prizeList');
+  if (list.children.length <= 1) { toast('至少需要一個獎品'); return; }
+  btn.closest('.prize-row').remove();
+}
+
+// ─── Step 6: Lottery ───
+function startLottery() {
+  // Build prize queue
+  prizeQueue = [];
+  const rows = document.querySelectorAll('.prize-row');
+  rows.forEach(row => {
+    const name = row.querySelector('.prize-name').value.trim() || '獎品';
+    const qty = parseInt(row.querySelector('.prize-qty').value) || 1;
+    for (let i = 0; i < qty; i++) {
+      prizeQueue.push(name);
+    }
+  });
+
+  const total = prizeQueue.length;
+  if (total === 0) { toast('請設定獎品'); return; }
+  if (filteredComments.length === 0) { toast('沒有可抽獎的留言'); return; }
+  if (filteredComments.length < total) {
+    toast(`留言數 (${filteredComments.length}) 少於獎品數 (${total})`);
+    return;
+  }
+
+  winners = [];
+  drawnIds = new Set();
+  document.getElementById('lotteryOverlay').classList.add('show');
+  drawNext();
+}
+
+function drawNext() {
+  if (prizeQueue.length === 0) {
+    // Done
+    document.getElementById('lotteryOverlay').classList.remove('show');
+    renderWinners();
+    show('step6');
+    toast('抽獎完成！🎉');
+    return;
+  }
+
+  const prize = prizeQueue.shift();
+  const noDup = document.getElementById('noDuplicate').checked;
+
+  // Pick available candidates
+  let candidates = filteredComments.filter(c => {
+    if (!c.from) return false;
+    if (noDup && drawnIds.has(c.from.id)) return false;
+    return true;
+  });
+
+  if (candidates.length === 0) {
+    toast('沒有更多候選人可抽取');
+    document.getElementById('lotteryOverlay').classList.remove('show');
+    if (winners.length > 0) { renderWinners(); show('step6'); }
+    return;
+  }
+
+  document.getElementById('currentPrizeLabel').textContent = `🎁 ${prize}`;
+  const nameEl = document.getElementById('slotName');
+  const avatarEl = document.getElementById('slotAvatar');
+  const nextBtn = document.getElementById('nextDrawBtn');
+  nextBtn.classList.add('hidden');
+  avatarEl.classList.remove('show');
+  nameEl.classList.add('rolling');
+
+  // Rolling animation
+  let rollCount = 0;
+  const rollInterval = setInterval(() => {
+    const rand = candidates[Math.floor(Math.random() * candidates.length)];
+    nameEl.textContent = rand.from.name;
+    rollCount++;
+    if (rollCount >= 30) {
+      clearInterval(rollInterval);
+      // Final pick
+      const winnerIdx = Math.floor(Math.random() * candidates.length);
+      const winner = candidates[winnerIdx];
+      nameEl.classList.remove('rolling');
+      nameEl.textContent = winner.from.name;
+
+      const pic = winner.from.picture ? winner.from.picture.data.url : '';
+      if (pic) {
+        avatarEl.src = pic;
+        avatarEl.classList.add('show');
+      }
+
+      drawnIds.add(winner.from.id);
+      winners.push({ name: winner.from.name, id: winner.from.id, picture: pic, prize, message: winner.message });
+
+      // Confetti
+      launchConfetti();
+
+      // Show next button
+      setTimeout(() => {
+        if (prizeQueue.length > 0) {
+          nextBtn.textContent = `抽出下一位 → (剩餘 ${prizeQueue.length} 份)`;
+        } else {
+          nextBtn.textContent = '✅ 查看完整名單';
+        }
+        nextBtn.classList.remove('hidden');
+      }, 1200);
+    }
+  }, 60);
+}
+
+function renderWinners() {
+  const grid = document.getElementById('winnersGrid');
+  grid.innerHTML = winners.map((w, i) => `
+    <div class="winner-card" style="animation-delay:${i * 0.1}s">
+      <img src="${w.picture || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect fill=%22%231a1a2e%22 width=%2250%22 height=%2250%22 rx=%2225%22/><text x=%2225%22 y=%2233%22 text-anchor=%22middle%22 fill=%22%236868a0%22 font-size=%2220%22>?</text></svg>'}" alt="">
+      <div class="winner-info">
+        <div class="winner-name">${esc(w.name)}</div>
+        <div class="winner-prize">🎁 ${esc(w.prize)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportCSV() {
+  if (winners.length === 0) { toast('沒有中獎名單'); return; }
+  const BOM = '\uFEFF';
+  let csv = BOM + '序號,中獎者,Facebook ID,獎品,留言內容\n';
+  winners.forEach((w, i) => {
+    csv += `${i+1},"${w.name}","${w.id}","${w.prize}","${(w.message||'').replace(/"/g,'""')}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `抽獎名單_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV 已下載');
+}
+
+function resetLottery() {
+  document.getElementById('step6').classList.add('hidden');
+  document.getElementById('step5').classList.remove('hidden');
+  winners = [];
+  drawnIds = new Set();
+}
+
+// ─── Confetti ───
+function launchConfetti() {
+  const container = document.getElementById('confetti');
+  const colors = ['#ffd700','#ff6b6b','#6c5ce7','#a29bfe','#fd79a8','#00b894','#ff9f43'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.5;
+    const size = 6 + Math.random() * 6;
+    c.style.cssText = `
+      position:absolute;left:${left}%;top:-10px;
+      width:${size}px;height:${size * 1.4}px;
+      background:${color};border-radius:2px;
+      animation:confettiFall ${1.8 + Math.random()}s ease-in ${delay}s forwards;
+      transform:rotate(${Math.random()*360}deg);
+    `;
+    container.appendChild(c);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3000);
+}
+
+// Inject confetti keyframes
+const style = document.createElement('style');
+style.textContent = `
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}`;
+document.head.appendChild(style);
+
+// ─── Helpers ───
+function show(id) {
+  document.getElementById(id).classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+</script>
+</body>
+</html>
