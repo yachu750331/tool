@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Cat Holdings 互動式企業關係圖</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2236;
+  --bg-card-inner: #0f1629;
+  --border-color: #1e2d4a;
+  --border-highlight: #2a3f6a;
+  --text-primary: #e8ecf4;
+  --text-secondary: #8b98b5;
+  --text-muted: #5a6884;
+  --accent-red: #ef4444;
+  --accent-orange: #f97316;
+  --accent-yellow: #eab308;
+  --accent-green: #22c55e;
+  --accent-cyan: #06b6d4;
+  --accent-blue: #3b82f6;
+  --accent-purple: #a855f7;
+  --accent-pink: #ec4899;
+  --accent-lime: #84cc16;
+  --tag-red-bg: rgba(239,68,68,0.15);
+  --tag-orange-bg: rgba(249,115,22,0.15);
+  --tag-green-bg: rgba(34,197,94,0.15);
+  --tag-blue-bg: rgba(59,130,246,0.15);
+  --tag-purple-bg: rgba(168,85,247,0.15);
+  --tag-cyan-bg: rgba(6,182,212,0.15);
+  --tag-yellow-bg: rgba(234,179,8,0.15);
+  --tag-pink-bg: rgba(236,72,153,0.15);
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+/* ─── Header ─── */
+.header {
+  text-align: center;
+  padding: 30px 0 20px;
+}
+
+.header-icon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.header h1 {
+  font-size: 24px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+.header .subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.header-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.header-hint span {
+  cursor: pointer;
+  color: var(--accent-cyan);
+}
+
+.update-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent-green), #16a34a);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+/* ─── Company Card ─── */
+.company-card {
+  background: linear-gradient(135deg, #1e293b 0%, #1a2236 100%);
+  border: 1px solid var(--border-highlight);
+  border-radius: 14px;
+  padding: 22px 28px;
+  text-align: center;
+  margin: 20px auto 28px;
+  max-width: 800px;
+}
+
+.company-card h2 {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+}
+
+.company-card .meta {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.tag-red { background: var(--tag-red-bg); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.3); }
+.tag-orange { background: var(--tag-orange-bg); color: var(--accent-orange); border: 1px solid rgba(249,115,22,0.3); }
+.tag-green { background: var(--tag-green-bg); color: var(--accent-green); border: 1px solid rgba(34,197,94,0.3); }
+.tag-blue { background: var(--tag-blue-bg); color: var(--accent-blue); border: 1px solid rgba(59,130,246,0.3); }
+.tag-purple { background: var(--tag-purple-bg); color: var(--accent-purple); border: 1px solid rgba(168,85,247,0.3); }
+.tag-cyan { background: var(--tag-cyan-bg); color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.3); }
+.tag-yellow { background: var(--tag-yellow-bg); color: var(--accent-yellow); border: 1px solid rgba(234,179,8,0.3); }
+.tag-pink { background: var(--tag-pink-bg); color: var(--accent-pink); border: 1px solid rgba(236,72,153,0.3); }
+
+/* ─── Section ─── */
+.section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-header .date {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-body {
+  padding: 16px 20px;
+}
+
+/* ─── Inner Card ─── */
+.inner-card {
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.inner-card:last-child { margin-bottom: 0; }
+
+.inner-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.inner-card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.kpi-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 100px;
+}
+
+.kpi-box .value {
+  font-size: 16px;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.kpi-box .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.kpi-box.red .value { color: var(--accent-red); }
+.kpi-box.orange .value { color: var(--accent-orange); }
+.kpi-box.green .value { color: var(--accent-green); }
+.kpi-box.blue .value { color: var(--accent-blue); }
+.kpi-box.cyan .value { color: var(--accent-cyan); }
+.kpi-box.purple .value { color: var(--accent-purple); }
+.kpi-box.yellow .value { color: var(--accent-yellow); }
+
+.badge-corner {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.badge-new { background: rgba(239,68,68,0.2); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.4); }
+.badge-progress { background: rgba(234,179,8,0.15); color: var(--accent-yellow); border: 1px solid rgba(234,179,8,0.3); }
+.badge-done { background: rgba(34,197,94,0.15); color: var(--accent-green); border: 1px solid rgba(34,197,94,0.3); }
+
+.source-line {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.source-line .dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  display: inline-block;
+}
+
+/* ─── Grid Layouts ─── */
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-2-1 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .grid-4 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ─── Cert / Contract Cards ─── */
+.cert-card, .contract-card {
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+}
+
+.cert-card .cert-icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.cert-card .cert-name {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cert-card .cert-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.cert-card .cert-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.contract-card .contract-name {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contract-card .contract-value {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.contract-card .contract-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.contract-card .contract-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.amount-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-left: 4px;
+}
+
+/* ─── Subsidiary Cards ─── */
+.sub-card {
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.sub-card .sub-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.sub-card .sub-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.sub-card .sub-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sub-card .sub-year {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.sub-card .sub-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.sub-card .sub-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ─── People Row ─── */
+.people-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.person-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 200px;
+  flex: 1;
+}
+
+.person-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.person-info .person-name {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.person-info .person-role {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.person-info .person-tag {
+  display: inline-block;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ─── Strategic Investment Cards ─── */
+.strat-card {
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.strat-card .strat-name {
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.strat-card .strat-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ─── Footer ─── */
+.footer {
+  text-align: center;
+  padding: 24px 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 20px;
+}
+
+.footer .nav-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.footer .nav-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.footer .nav-tag:hover {
+  color: var(--accent-cyan);
+  background: rgba(6,182,212,0.1);
+}
+
+.footer .credit {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ─── Scrollable row ─── */
+.scroll-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-highlight) transparent;
+}
+
+.scroll-row::-webkit-scrollbar { height: 4px; }
+.scroll-row::-webkit-scrollbar-thumb { background: var(--border-highlight); border-radius: 4px; }
+
+.scroll-row > * {
+  flex: 0 0 220px;
+}
+
+/* ─── Highlight border effect ─── */
+.highlight-red { border-left: 3px solid var(--accent-red); }
+.highlight-orange { border-left: 3px solid var(--accent-orange); }
+.highlight-green { border-left: 3px solid var(--accent-green); }
+.highlight-blue { border-left: 3px solid var(--accent-blue); }
+.highlight-purple { border-left: 3px solid var(--accent-purple); }
+.highlight-cyan { border-left: 3px solid var(--accent-cyan); }
+.highlight-yellow { border-left: 3px solid var(--accent-yellow); }
+
+/* ─── Section Title with link ─── */
+.section-link {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+/* ─── Two-col layout ─── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  .two-col { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══════ HEADER ═══════ -->
+  <div class="header">
+    <div class="header-icon">🛩️</div>
+    <h1>Red Cat Holdings 互動式企業關係圖</h1>
+    <div class="subtitle">國防無人機 · 軍事合約 · 全域自主系統</div>
+    <div class="header-hint">👆 點擊任意卡片查看詳細資訊</div>
+    <div class="update-badge">📅 更新至 2026年3月30日</div>
+  </div>
+
+  <!-- ═══════ COMPANY CARD ═══════ -->
+  <div class="company-card">
+    <h2>RED CAT HOLDINGS</h2>
+    <div class="meta">NASDAQ: RCAT｜股價: $15.87｜市值: ~$1.36B</div>
+    <div class="tag-row">
+      <span class="tag tag-red">🎯 國防無人機</span>
+      <span class="tag tag-orange">📈 2025營收 $40.7M</span>
+      <span class="tag tag-green">💰 現金 $167.9M</span>
+      <span class="tag tag-blue">🏭 產能 254,000 sq.ft.</span>
+      <span class="tag tag-purple">🤖 Apium收購 2026/3</span>
+      <span class="tag tag-cyan">🇺🇦 烏克蘭合作 2026/3</span>
+      <span class="tag tag-yellow">🦅 Black Widow SRR</span>
+    </div>
+  </div>
+
+  <!-- ═══════ Q4 2025 業績 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>📊 Q4 2025 業績報告</h3>
+      <span class="date">2026年3月18日</span>
+    </div>
+    <div class="section-body">
+      <div class="inner-card">
+        <div class="inner-card-title">🔥 Q4'25營收創紀錄 $26.2M｜FY2025營收成長161%</div>
+        <span class="badge-corner badge-new">⚡ 最新業績</span>
+        <div class="inner-card-desc">
+          Q4'25營收$26.2M (年增1,985%，季增172%)。FY2025全年營收$40.7M (年增161%)。現金部位$167.9M。產能擴張520%至254,000平方呎。EPS -$0.17 (略低於預期-$0.15)。未提供2026年營收指引。
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box red">
+            <div class="value">$26.2M</div>
+            <div class="label">Q4營收</div>
+          </div>
+          <div class="kpi-box orange">
+            <div class="value">$40.7M</div>
+            <div class="label">FY2025營收</div>
+          </div>
+          <div class="kpi-box green">
+            <div class="value">$167.9M</div>
+            <div class="label">現金部位</div>
+          </div>
+          <div class="kpi-box blue">
+            <div class="value">1,985%</div>
+            <div class="label">Q4 YoY成長</div>
+          </div>
+          <div class="kpi-box purple">
+            <div class="value">254K sqft</div>
+            <div class="label">製造產能</div>
+          </div>
+        </div>
+        <div class="source-line">
+          <span class="dot"></span>
+          SEC Form 8-K · 2026年3月18日 · Salt Lake City, UT
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 美國陸軍 SRR 合約 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>🎖️ 美國陸軍SRR主力合約</h3>
+      <span class="date">SRR Program of Record</span>
+    </div>
+    <div class="section-body">
+      <div class="inner-card highlight-red">
+        <div class="inner-card-title">🦅 Black Widow™ — 美國陸軍短程偵察計畫</div>
+        <span class="badge-corner badge-done">✅ 已簽約量產</span>
+        <div class="inner-card-desc">
+          Red Cat旗下Teal Drones的Black Widow™獲選為美國陸軍短程偵察 (SRR) 計畫主力系統之一。該多年期合約最多可採購5,880架Black Widow無人機。Tranche 2 LRIP合約於2025年7月簽署，目前價值已擴增至約$35M，並持續擴大。Black Widow已列入國防部Blue UAS採購清單及NATO NSPA目錄。
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box red">
+            <div class="value">~$35M+</div>
+            <div class="label">T2 LRIP合約價值</div>
+          </div>
+          <div class="kpi-box orange">
+            <div class="value">5,880架</div>
+            <div class="label">最大採購量</div>
+          </div>
+          <div class="kpi-box green">
+            <div class="value">2025年7月</div>
+            <div class="label">T2簽約時間</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 認證與資質 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>✅ 認證與資質</h3>
+      <span class="section-link">展開詳情</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-4">
+
+        <div class="cert-card">
+          <div class="cert-icon">🛡️</div>
+          <div class="cert-name">Blue UAS清單 <span class="tag tag-green" style="font-size:9px;padding:1px 6px;">已認證</span></div>
+          <div class="cert-desc">Black Widow、Edge 130、FANG FPV均列入國防部Blue UAS採購清單。</div>
+          <div class="cert-date">📅 2025年2月更新</div>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-icon">🌐</div>
+          <div class="cert-name">NATO NSPA目錄 <span class="tag tag-blue" style="font-size:9px;padding:1px 6px;">已認證</span></div>
+          <div class="cert-desc">Black Widow系統已加入NATO支援與採購機構目錄，可供盟國採購。</div>
+          <div class="cert-date">📅 2025年11月</div>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-icon">📋</div>
+          <div class="cert-name">NDAA合規 <span class="tag tag-green" style="font-size:9px;padding:1px 6px;">合規</span></div>
+          <div class="cert-desc">全產品線符合國防授權法案 (NDAA) 規範，100%美國製造。</div>
+          <div class="cert-date">📅 FY25 NDAA §1709</div>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-icon">✈️</div>
+          <div class="cert-name">AS9100認證 <span class="tag tag-purple" style="font-size:9px;padding:1px 6px;">已認證</span></div>
+          <div class="cert-desc">Teal Drones獲得AS9100航太與國防製造品質管理認證。</div>
+          <div class="cert-date">📅 2025年8月</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 重大合約 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>📑 重大合約</h3>
+      <span class="section-link">合約總覽</span>
+    </div>
+    <div class="section-body">
+      <div class="scroll-row">
+
+        <div class="contract-card highlight-red">
+          <div class="contract-name">陸軍SRR T2 <span class="amount-badge" style="background:var(--tag-red-bg);color:var(--accent-red);">$35M+</span></div>
+          <div class="contract-desc">Black Widow LRIP Tranche 2合約，已多次擴增價值。</div>
+          <div class="contract-date">📅 2025年7月簽署</div>
+        </div>
+
+        <div class="contract-card highlight-orange">
+          <div class="contract-name">亞太盟國訂單 <span class="amount-badge" style="background:var(--tag-orange-bg);color:var(--accent-orange);">未公開</span></div>
+          <div class="contract-desc">第二個亞太盟國選擇Black Widow系統，2026年交付。</div>
+          <div class="contract-date">📅 2025年12月</div>
+        </div>
+
+        <div class="contract-card highlight-blue">
+          <div class="contract-name">Edge 130訂單 <span class="amount-badge" style="background:var(--tag-blue-bg);color:var(--accent-blue);">$518K</span></div>
+          <div class="contract-desc">來自陸軍國民警衛隊及其他政府機構，共12架Edge 130。</div>
+          <div class="contract-date">📅 2025年1月</div>
+        </div>
+
+        <div class="contract-card highlight-green">
+          <div class="contract-name">Drone Dominance計畫 <span class="amount-badge" style="background:var(--tag-green-bg);color:var(--accent-green);">$1B計畫</span></div>
+          <div class="contract-desc">參與五角大廈價值$1B的無人機主導計畫。</div>
+          <div class="contract-date">📅 進行中</div>
+        </div>
+
+        <div class="contract-card highlight-purple">
+          <div class="contract-name">烏克蘭STE合作 <span class="amount-badge" style="background:var(--tag-purple-bg);color:var(--accent-purple);">MOU</span></div>
+          <div class="contract-desc">與烏克蘭國防部旗下Spetstechnoexport簽署戰略合作備忘錄。</div>
+          <div class="contract-date">📅 2026年3月</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 子公司與事業體 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>🏢 子公司與事業體</h3>
+      <span class="date">4個子公司 · 全域覆蓋</span>
+    </div>
+    <div class="section-body">
+
+      <div class="inner-card" style="margin-bottom:16px;">
+        <div class="inner-card-title">🛩️ 全域無人系統生態系</div>
+        <div class="inner-card-desc">
+          Red Cat透過全資子公司Teal Drones、FlightWave Aerospace、Blue Ops及新收購的Apium Swarm Robotics，覆蓋空中、海上、地面三大作戰域，打造完整的美國製造無人系統平台。
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-box cyan">
+            <div class="value">4</div>
+            <div class="label">全資子公司</div>
+          </div>
+          <div class="kpi-box green">
+            <div class="value">3 域</div>
+            <div class="label">空·海·地</div>
+          </div>
+          <div class="kpi-box orange">
+            <div class="value">254K sqft</div>
+            <div class="label">總製造面積</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 16px;">
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-red-bg);">🦅</div>
+            <div>
+              <div class="sub-name">Teal Drones <span class="sub-year" style="background:var(--tag-red-bg);color:var(--accent-red);">核心子公司</span></div>
+            </div>
+          </div>
+          <div class="sub-desc">開發Black Widow™ SRR無人機系統，美國陸軍SRR計畫主力供應商。Blue UAS認證、NATO目錄通過。總部位於鹽湖城。</div>
+          <div class="sub-meta">🏭 主力製造設施 · SRR量產基地</div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-blue-bg);">🌊</div>
+            <div>
+              <div class="sub-name">Blue Ops <span class="sub-year" style="background:var(--tag-blue-bg);color:var(--accent-blue);">2025年Q3成立</span></div>
+            </div>
+          </div>
+          <div class="sub-desc">海上無人系統部門，開發無人水面艦 (USV) 武器系統。166,000 sqft喬治亞州設施，與Hodgdon Shipbuilding合作生產原型。</div>
+          <div class="sub-meta">🚢 年產能 500+ 艘 · 與ACS合作Bullfrog系統</div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-green-bg);">🔄</div>
+            <div>
+              <div class="sub-name">FlightWave Aerospace <span class="sub-year" style="background:var(--tag-green-bg);color:var(--accent-green);">2024年9月收購</span></div>
+            </div>
+          </div>
+          <div class="sub-desc">開發Edge 130 Blue VTOL無人機，用於中程ISR任務。60+分鐘飛行時間，軍用級三旋翼設計。51,000 sqft設施。</div>
+          <div class="sub-meta">🔋 業界領先續航力 · Blue UAS認證</div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-purple-bg);">🤖</div>
+            <div>
+              <div class="sub-name">Apium Swarm Robotics <span class="sub-year" style="background:var(--tag-purple-bg);color:var(--accent-purple);">2026年3月收購</span></div>
+            </div>
+          </div>
+          <div class="sub-desc">分散式自主蜂群控制系統開發商，整合至Red Cat全產品線。支援無通訊環境下協同作戰。</div>
+          <div class="sub-meta">🆕 最新收購 · 多代理自主架構</div>
+        </div>
+      </div>
+
+      <!-- 領導團隊 -->
+      <div style="padding:8px 0 4px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">👥 核心領導團隊</div>
+      </div>
+      <div class="people-row">
+        <div class="person-card">
+          <div class="person-avatar" style="background:var(--tag-red-bg);color:var(--accent-red);">JT</div>
+          <div class="person-info">
+            <div class="person-name">Jeff Thompson</div>
+            <div class="person-role">CEO 執行長</div>
+            <div class="person-tag" style="background:var(--tag-red-bg);color:var(--accent-red);">CEO</div>
+          </div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar" style="background:var(--tag-blue-bg);color:var(--accent-blue);">GM</div>
+          <div class="person-info">
+            <div class="person-name">George Matus</div>
+            <div class="person-role">CTO 技術長 / Teal創辦人</div>
+            <div class="person-tag" style="background:var(--tag-blue-bg);color:var(--accent-blue);">CTO</div>
+          </div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar" style="background:var(--tag-green-bg);color:var(--accent-green);">CE</div>
+          <div class="person-info">
+            <div class="person-name">Chris Ericson</div>
+            <div class="person-role">CFO 財務長</div>
+            <div class="person-tag" style="background:var(--tag-green-bg);color:var(--accent-green);">CFO</div>
+          </div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar" style="background:var(--tag-orange-bg);color:var(--accent-orange);">GH</div>
+          <div class="person-info">
+            <div class="person-name">Geoffrey Hitchcock</div>
+            <div class="person-role">CRO 營收長</div>
+            <div class="person-tag" style="background:var(--tag-orange-bg);color:var(--accent-orange);">CRO</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════ 產品系統 Family of Systems ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>🔧 產品系統 (Family of Systems)</h3>
+      <span class="date">5大產品線</span>
+    </div>
+    <div class="section-body">
+      <div class="scroll-row">
+
+        <div class="contract-card highlight-red" style="flex:0 0 240px;">
+          <div class="contract-name">🦅 Black Widow™</div>
+          <div class="contract-value" style="color:var(--accent-red);">短程偵察 (SRR) sUAS</div>
+          <div class="contract-desc">美國陸軍SRR計畫主力系統。ISR、周界安全、監視。Blue UAS認證，NATO NSPA通過。</div>
+          <div class="contract-date">🏆 核心產品</div>
+        </div>
+
+        <div class="contract-card highlight-orange" style="flex:0 0 240px;">
+          <div class="contract-name">🔥 FANG™ FPV</div>
+          <div class="contract-value" style="color:var(--accent-orange);">第一人稱視角攻擊無人機</div>
+          <div class="contract-desc">FPV打擊無人機，Blue UAS認證 (2025/10)。可從AeroVironment P550 UAS部署。</div>
+          <div class="contract-date">📅 2025年10月認證</div>
+        </div>
+
+        <div class="contract-card highlight-green" style="flex:0 0 240px;">
+          <div class="contract-name">🔄 Edge 130 Blue</div>
+          <div class="contract-value" style="color:var(--accent-green);">VTOL中程ISR三旋翼</div>
+          <div class="contract-desc">FlightWave旗艦產品，60+分鐘飛行時間。軍用級，1200g，單人操作。</div>
+          <div class="contract-date">📅 Blue UAS認證</div>
+        </div>
+
+        <div class="contract-card highlight-blue" style="flex:0 0 240px;">
+          <div class="contract-name">🚢 Blue Ops USV</div>
+          <div class="contract-value" style="color:var(--accent-blue);">無人水面艦武器系統</div>
+          <div class="contract-desc">全新海上作戰平台。與Hodgdon Shipbuilding合作生產，整合Bullfrog反無人機系統。</div>
+          <div class="contract-date">📅 2025年Q4原型交付</div>
+        </div>
+
+        <div class="contract-card highlight-purple" style="flex:0 0 240px;">
+          <div class="contract-name">🤖 IntelliSwarm</div>
+          <div class="contract-value" style="color:var(--accent-purple);">自主蜂群控制系統</div>
+          <div class="contract-desc">Apium技術整合。支援去中心化多代理自主協同作戰，適用異構UAV平台。</div>
+          <div class="contract-date">📅 整合中</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 國防/政策關係 (兩欄) ═══════ -->
+  <div class="two-col">
+
+    <div class="section">
+      <div class="section-header">
+        <h3>🇺🇸 美國國防關係</h3>
+        <span class="date">核心客戶</span>
+      </div>
+      <div class="section-body">
+        <div class="inner-card highlight-red">
+          <div class="inner-card-title">美國陸軍</div>
+          <div class="inner-card-desc">SRR計畫主約供應商，Tranche 2 LRIP合約 ~$35M+。多年期最多可採購5,880架Black Widow。</div>
+        </div>
+        <div class="inner-card highlight-blue" style="margin-top:10px;">
+          <div class="inner-card-title">五角大廈 Drone Dominance</div>
+          <div class="inner-card-desc">參與國防部$1B無人機主導計畫，強化美國自主無人機生產能力。</div>
+        </div>
+        <div class="inner-card highlight-green" style="margin-top:10px;">
+          <div class="inner-card-title">陸軍國民警衛隊 / OGA</div>
+          <div class="inner-card-desc">Edge 130無人機訂單，供國民警衛隊及其他政府機構使用。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h3>🌍 國際盟國關係</h3>
+        <span class="date">2026</span>
+      </div>
+      <div class="section-body">
+        <div class="inner-card highlight-orange">
+          <div class="inner-card-title">亞太盟國 (2國)</div>
+          <div class="inner-card-desc">兩個亞太盟國已選擇Black Widow系統用於軍事用途，2026年交付。</div>
+        </div>
+        <div class="inner-card highlight-purple" style="margin-top:10px;">
+          <div class="inner-card-title">🇺🇦 烏克蘭 Spetstechnoexport</div>
+          <div class="inner-card-desc">與烏克蘭國防部旗下STE簽署MOU，合作開發多域無人系統。烏克蘭年需求量達350,000架偵察無人機。</div>
+        </div>
+        <div class="inner-card highlight-cyan" style="margin-top:10px;">
+          <div class="inner-card-title">NATO盟國</div>
+          <div class="inner-card-desc">Black Widow已列入NATO NSPA目錄，3年期合約可延長2年，供32國成員採購。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════ Futures Initiative 合作夥伴 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>🤝 Futures Initiative 合作夥伴</h3>
+      <span class="date">生態系擴展</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-3">
+
+        <div class="strat-card">
+          <div class="strat-name">
+            <span style="color:var(--accent-blue);">🔷</span> Palantir
+            <span class="tag tag-blue" style="font-size:9px;padding:1px 6px;">軟體</span>
+          </div>
+          <div class="strat-desc">VNav視覺導航軟體成功整合至Black Widow，強化GPS拒止環境作戰能力。</div>
+        </div>
+
+        <div class="strat-card">
+          <div class="strat-name">
+            <span style="color:var(--accent-green);">🔶</span> AeroVironment
+            <span class="tag tag-green" style="font-size:9px;padding:1px 6px;">整合</span>
+          </div>
+          <div class="strat-desc">合作將FANG FPV部署於AV的P550 UAS平台，擴大打擊範圍。</div>
+        </div>
+
+        <div class="strat-card">
+          <div class="strat-name">
+            <span style="color:var(--accent-orange);">🎯</span> Allen Control Systems
+            <span class="tag tag-orange" style="font-size:9px;padding:1px 6px;">反無人機</span>
+          </div>
+          <div class="strat-desc">整合Bullfrog自主反無人機武器站至Blue Ops USV，強化海上防禦。</div>
+        </div>
+
+        <div class="strat-card">
+          <div class="strat-name">
+            <span style="color:var(--accent-purple);">🕸️</span> Apium Swarm Robotics
+            <span class="tag tag-purple" style="font-size:9px;padding:1px 6px;">已收購</span>
+          </div>
+          <div class="strat-desc">自主蜂群控制技術，已於2026年3月完成收購，整合至全產品線。</div>
+        </div>
+
+        <div class="strat-card">
+          <div class="strat-name">
+            <span style="color:var(--accent-cyan);">🔒</span> SpiderOak
+            <span class="tag tag-cyan" style="font-size:9px;padding:1px 6px;">資安</span>
+          </div>
+          <div class="strat-desc">執行Blue UAS資安評估，包含滲透測試、FOCI評估、NIST合規驗證。</div>
+        </div>
+
+        <div class="strat-card">
+          <div class="strat-name">
+            <span style="color:var(--accent-yellow);">⚓</span> Hodgdon Shipbuilding
+            <span class="tag tag-yellow" style="font-size:9px;padding:1px 6px;">造船</span>
+          </div>
+          <div class="strat-desc">合作生產Blue Ops首批5艘USV原型，設施位於緬因州。</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 政策利多 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>📜 政策與法規利多</h3>
+      <span class="date">NDAA · FCC</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+
+        <div class="inner-card highlight-green">
+          <div class="inner-card-title">FY25 NDAA §1709 — 禁止外國無人機</div>
+          <div class="inner-card-desc">FCC已開始執行NDAA第1709條，禁止外國製無人機及關鍵零組件獲得FCC認證進入美國市場。直接受惠Red Cat等美國製造商。RCAT股價2026年已上漲超過60%。</div>
+        </div>
+
+        <div class="inner-card highlight-blue">
+          <div class="inner-card-title">Blue UAS框架擴展</div>
+          <div class="inner-card-desc">國防部持續擴展Blue UAS認證清單，Red Cat旗下Black Widow、Edge 130、FANG FPV三大系統均已通過認證，簡化政府採購流程。</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 設施與產能 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>🏭 製造設施與產能</h3>
+      <span class="date">520%產能擴張</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-3">
+
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-red-bg);">🏗️</div>
+            <div>
+              <div class="sub-name">Teal Drones 設施</div>
+            </div>
+          </div>
+          <div class="sub-desc">鹽湖城主力製造基地。Black Widow量產線，支援SRR計畫交付。</div>
+          <div class="sub-meta">📍 Salt Lake City, UT</div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-blue-bg);">🚢</div>
+            <div>
+              <div class="sub-name">Blue Ops 設施</div>
+            </div>
+          </div>
+          <div class="sub-desc">166,000 sqft 喬治亞州設施，年產能500+艘USV。</div>
+          <div class="sub-meta">📍 Georgia · 166K sqft</div>
+        </div>
+
+        <div class="sub-card">
+          <div class="sub-header">
+            <div class="sub-icon" style="background:var(--tag-green-bg);">✈️</div>
+            <div>
+              <div class="sub-name">FlightWave 設施</div>
+            </div>
+          </div>
+          <div class="sub-desc">51,000 sqft設施，Edge 130生產線。</div>
+          <div class="sub-meta">📍 51K sqft</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 分析師觀點 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>📈 分析師觀點</h3>
+      <span class="date">最近更新</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+
+        <div class="inner-card highlight-green">
+          <div class="inner-card-title">Needham — 買入 (Buy)</div>
+          <div class="inner-card-desc">2026/3/19維持買入評級，目標價從$16調升至$20。</div>
+          <div class="kpi-row">
+            <div class="kpi-box green">
+              <div class="value">$20</div>
+              <div class="label">目標價</div>
+            </div>
+            <div class="kpi-box cyan">
+              <div class="value">Buy</div>
+              <div class="label">評級</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inner-card highlight-blue">
+          <div class="inner-card-title">市場共識</div>
+          <div class="inner-card-desc">分析師普遍給予「強力買入」至「買入」評級。平均目標價$21.75，高點$25。P/S約42-49x，反映市場對未來高成長的期待。</div>
+          <div class="kpi-row">
+            <div class="kpi-box orange">
+              <div class="value">$21.75</div>
+              <div class="label">平均目標價</div>
+            </div>
+            <div class="kpi-box purple">
+              <div class="value">~42x</div>
+              <div class="label">P/S ratio</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ 風險提示 ═══════ -->
+  <div class="section">
+    <div class="section-header">
+      <h3>⚠️ 關鍵風險</h3>
+    </div>
+    <div class="section-body">
+      <div class="grid-3">
+        <div class="inner-card" style="border-left:3px solid var(--accent-yellow);">
+          <div class="inner-card-title" style="font-size:13px;">毛利率僅4%</div>
+          <div class="inner-card-desc">Q4毛利率極低，規模化量產後能否改善仍待觀察。營運現金流出$89.1M。</div>
+        </div>
+        <div class="inner-card" style="border-left:3px solid var(--accent-orange);">
+          <div class="inner-card-title" style="font-size:13px;">未提供2026指引</div>
+          <div class="inner-card-desc">管理層未發布2026年營收指引，市場期待高成長但缺乏具體路線圖。</div>
+        </div>
+        <div class="inner-card" style="border-left:3px solid var(--accent-red);">
+          <div class="inner-card-title" style="font-size:13px;">高估值風險</div>
+          <div class="inner-card-desc">P/S 42-49x，空頭利率超過20%。盈利時程不確定，股價波動劇烈 (52週低$1.66 / 高$15.27)。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ Footer ═══════ -->
+  <div class="footer">
+    <div class="nav-tags">
+      <span class="nav-tag">📊 財務數據</span>
+      <span class="nav-tag">🎖️ 陸軍合約</span>
+      <span class="nav-tag">✅ 認證</span>
+      <span class="nav-tag">📑 合約</span>
+      <span class="nav-tag">🏢 子公司</span>
+      <span class="nav-tag">🔧 產品</span>
+      <span class="nav-tag">🤝 合作</span>
+      <span class="nav-tag">🏭 設施</span>
+      <span class="nav-tag">📈 分析師</span>
+      <span class="nav-tag">⚠️ 風險</span>
+    </div>
+    <div class="credit">
+      資料來源：Red Cat Holdings 官方IR網站、SEC Filing (8-K)、StockTitan、Yahoo Finance 公開資訊｜更新至2026年3月30日
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
